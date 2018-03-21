@@ -1,0 +1,8 @@
+{"split playlist into chunks of" : 2000,
+  "Limit extensions to" : ["FLAC", "M4A", "MP3", "MP4", "OGG", "WAV", "WMA", "WMV"],
+  "music folder" : "/path/to/music/",
+  "print a list of extensions" : false,
+  "print a list of file names" : true,
+  "limit list file names to" : 20,
+  "output folder" : "/path/to/output/",
+  "shuffle playlist" : true, "Split playlist" : true}
