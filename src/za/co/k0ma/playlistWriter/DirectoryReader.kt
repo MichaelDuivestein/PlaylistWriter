@@ -1,14 +1,12 @@
+import za.co.k0ma.playlistWriter.FileData
 import java.io.File
-import java.util.TreeSet
 
 class DirectoryReader(private val config: Config) {
 	//this keeps a list of the unique extensions we've added
-	private var uniqueExtensions = TreeSet<String>()
-	var files = ArrayList<File>()
-	
-	fun readFiles() {
+	fun readFiles() : FileData {
 		val root = File(config.inputPath)
 		val whitelist = config.extensionWhitelist?.takeIf { it.isNotEmpty() }?.toSet()
+		val fileData = FileData()
 		
 		println("----- Starting scan ------")
 		
@@ -16,30 +14,14 @@ class DirectoryReader(private val config: Config) {
 				.filter { it.isFile }
 				.filter { whitelist?.contains(it.extension.toUpperCase()) ?: true }
 				.forEach { file ->
-					uniqueExtensions.add(file.extension.toUpperCase())
-					files.add(file)
+					fileData.uniqueExtensions.add(file.extension.toUpperCase())
+					fileData.files.add(file)
 				}
 		
-		println("files found: ${files.size}")
-		println("unique extensions found: ${uniqueExtensions.size}")
+		println("files found: ${fileData.files.size}")
+		println("unique extensions found: ${fileData.uniqueExtensions.size}")
 		println("----- Finished scan ------")
-	}
-	
-	fun listFiles(limitListSize: Int?) {
-		println("----- List start ------")
-		files.take(limitListSize ?: files.size)
-				.forEach(::println)
 		
-		if (limitListSize != null) {
-			println("----- List reached limit ------")
-		}
-		
-		println("----- List end ------")
-	}
-	
-	fun listExtensions() {
-		println("----- listing extensions ------")
-		uniqueExtensions.forEach(::println)
-		println("----- List end ------")
+		return fileData
 	}
 }

@@ -6,22 +6,22 @@ fun main(args: Array<String>) {
 	if (config == null) {
 		println("config is null. Aborting")
 		return
-	} else if (! config.isInputAndOutputPathLoaded()) {
+	} else if (!config.isInputAndOutputPathLoaded()) {
 		println("Input path and/or output path not set in config. Aborting")
 		return
 	}
 	
 	val reader = DirectoryReader(config)
-	reader.readFiles()
+	val fileData = reader.readFiles()
 	if (config.listExtensions) {
-		reader.listExtensions()
+		fileData.listExtensions()
 	}
 	if (config.listFiles) {
-		reader.listFiles(config.listLimit)
+		fileData.listFiles(config.listLimit)
 	}
-	val writer = PlaylistWriter(reader.files, config.outputPath!!)
+	val writer = PlaylistWriter(config.outputPath!! + config.playlistName)
 	if (config.shufflePlaylist) {
-		writer.shuffle()
+		fileData.files = writer.shuffle(fileData.files)
 	}
-	writer.writePlaylist(config.chunkSize)
+	writer.writePlaylist(fileData.files, config.chunkSize, config.readTags)
 }
