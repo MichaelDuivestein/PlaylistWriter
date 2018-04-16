@@ -1,3 +1,5 @@
+import java.io.File
+
 fun main(args: Array<String>) {
 	println("Starting main")
 	val inputPath = args[0]
@@ -6,7 +8,7 @@ fun main(args: Array<String>) {
 	if (config == null) {
 		println("config is null. Aborting")
 		return
-	} else if (!config.isInputAndOutputPathLoaded()) {
+	} else if (!config.isInputAndOutputPathLoaded) {
 		println("Input path and/or output path not set in config. Aborting")
 		return
 	}
@@ -21,7 +23,7 @@ fun main(args: Array<String>) {
 	}
 	val writer = PlaylistWriter(config.outputPath!! + config.playlistName)
 	if (config.shufflePlaylist) {
-		fileData.files = writer.shuffle(fileData.files)
+		fileData.files = writer.shuffle(fileData.files) as ArrayList<File>
 	}
 	writer.writePlaylist(fileData.files, config.chunkSize, config.readTags)
 }

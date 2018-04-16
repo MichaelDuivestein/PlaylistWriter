@@ -30,7 +30,8 @@ data class Config(
 	/**
 	 * Determines if the minimum we need to create a playlist is present (inputPath & outputPath)
 	 */
-	fun isInputAndOutputPathLoaded(): Boolean {
-		return inputPath != null && outputPath != null && playlistName != null
-	}
+	val isInputAndOutputPathLoaded
+		get() = inputPath != null && outputPath != null && playlistName != null
+	
+	
 }

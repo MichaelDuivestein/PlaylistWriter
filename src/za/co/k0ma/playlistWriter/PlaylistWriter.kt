@@ -1,8 +1,6 @@
-import org.apache.commons.lang3.StringUtils
 import java.io.File
 import java.io.RandomAccessFile
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * File looks like this:
@@ -21,11 +19,7 @@ class PlaylistWriter(private val outputPathAndName: String) {
 	/**
 	 * Basic shuffle. Can do something better later
 	 */
-	fun shuffle(files: ArrayList<File>): ArrayList<File> {
-		val shuffledFiles = ArrayList<File>(files)
-		shuffledFiles.shuffle(Random());
-		return shuffledFiles
-	}
+	fun shuffle(files: Iterable<File>): List<File> = files.shuffled(Random())
 	
 	fun writePlaylist(files: MutableList<File>, chunkSize: Int, readTags: Boolean) {
 		println("------ Writing playlists. ------")
@@ -33,7 +27,7 @@ class PlaylistWriter(private val outputPathAndName: String) {
 		//chop playlist into a bunch of smaller playlists
 		val fileSet = files.chunked(chunkSize.takeIf { it > 2 } ?: files.size)
 		
-		println("writing ${fileSet.size} files containing up to ${chunkSize} entries.")
+		println("writing ${fileSet.size} files containing up to $chunkSize entries.")
 		
 		for ((playlistCounter, fileList) in fileSet.withIndex()) {
 			val outputFile = File(outputPathAndName + "_"
@@ -43,7 +37,7 @@ class PlaylistWriter(private val outputPathAndName: String) {
 			writeEntry(fileList, outputFile, readTags)
 		}
 		
-		println("------ Finished writing files ------");
+		println("------ Finished writing files ------")
 	}
 	
 	private fun writeEntry(fileList: List<File>, outputFile: File, readTags: Boolean) {
@@ -53,39 +47,35 @@ class PlaylistWriter(private val outputPathAndName: String) {
 		}
 	}
 	
-	private fun createTitle(file: File, readTags: Boolean): String {
-		var title = file.nameWithoutExtension
-		
-		if (!readTags) {
-			return title
+	private fun createTitle(file: File, readTags: Boolean) =
+			if (readTags) {
+				readTag(file)
+			} else {
+				file.nameWithoutExtension
+			}
+	
+	private fun readTag(file: File) = when (file.extension.toLowerCase()) {
+		"mp3" -> readID3Tag(file)
+		else -> {
+			file.nameWithoutExtension
 		}
-		
-		val extension = file.extension
-		
-		when (extension.toLowerCase()) {
-			"mp3" -> title = readID3Tag(file)
-		}
-		
-		return title
 	}
 	
 	//TODO: Move tag reading stuff to it's own class
-	fun readID3Tag(file: File): String {
-		var randomAccessFile: RandomAccessFile? = null
+	private fun readID3Tag(file: File): String {
+		val randomAccessFile = RandomAccessFile(file, "r")
 		try {
-			randomAccessFile = RandomAccessFile(file, "r");
-			
-			when (getTagType(randomAccessFile)) {
-				TagType.NONE -> return file.nameWithoutExtension;
-				TagType.ID3V1 -> return readID3V1Tag(randomAccessFile);
-				TagType.ID3V1_ENHANCED -> return readID3V1EnhancedTag(randomAccessFile)
-				TagType.ID3V2 -> return readID3V2Tag(randomAccessFile, file.nameWithoutExtension)
+			return when (getTagType(randomAccessFile)) {
+				TagType.NONE -> file.nameWithoutExtension
+				TagType.ID3V1 -> readID3V1Tag(randomAccessFile)
+				TagType.ID3V1_ENHANCED -> readID3V1EnhancedTag(randomAccessFile)
+				TagType.ID3V2 -> readID3V2Tag(randomAccessFile, file.nameWithoutExtension)
 			}
 		} catch (exception: Exception) {
 			println("ERROR: ")
 			println(exception.stackTrace)
 		} finally {
-			randomAccessFile?.close();
+			randomAccessFile.close()
 		}
 		
 		return file.nameWithoutExtension
@@ -94,13 +84,9 @@ class PlaylistWriter(private val outputPathAndName: String) {
 	private fun readBytes(randomAccessFile: RandomAccessFile, length: Int, stripWhitespace: Boolean): String {
 		val tagBytes = ByteArray(length)
 		randomAccessFile.read(tagBytes)
-		var value = String(tagBytes, Charsets.UTF_8)
+		val value = String(tagBytes, Charsets.UTF_8)
 		
-		if (stripWhitespace) {
-			value = value.replace("\u0000", "").trim()
-		}
-		
-		return value;
+		return if (stripWhitespace) value.replace("\u0000", "").trim() else value
 	}
 	
 	//Checks for ID3 Tag and returns version.
@@ -112,45 +98,40 @@ class PlaylistWriter(private val outputPathAndName: String) {
 		//TODO: let's try with the most common: ID3V2. (Some ID3V2 files contain a 'backup' ID3V1)
 		
 		//perhaps it's an ID3v1 tag
-		randomAccessFile.seek(randomAccessFile.length() - 128);
+		randomAccessFile.seek(randomAccessFile.length() - 128)
 		var tag = readBytes(randomAccessFile, 3, true)
 		if ("tag".equals(tag, true)) {
 			//There is no ID3 tag
-			return TagType.ID3V1;
+			return TagType.ID3V1
 		}
 		
 		//see if it's an ID3V1Enhanced tag
 		//do this last, as these tags are hardly used and often stale.
-		randomAccessFile.seek(randomAccessFile.length() - 227);
-		readBytes(randomAccessFile, 4, true)
+		randomAccessFile.seek(randomAccessFile.length() - 227)
+		tag = readBytes(randomAccessFile, 4, true)
 		if ("tag+".equals(tag, true)) {
 			//There is no ID3 tag
-			return TagType.ID3V1_ENHANCED;
+			return TagType.ID3V1_ENHANCED
 		}
 		
 		return TagType.NONE
 	}
 	
-	private fun readID3V1Tag(randomAccessFile: RandomAccessFile): String {
-		return readID3V1Tag(randomAccessFile, 125, 30)
-	}
-	
-	private fun readID3V1EnhancedTag(randomAccessFile: RandomAccessFile): String {
-		return readID3V1Tag(randomAccessFile, 224, 60)
-	}
+	private fun readID3V1Tag(randomAccessFile: RandomAccessFile) = readID3V1Tag(randomAccessFile, 125, 30)
+	private fun readID3V1EnhancedTag(randomAccessFile: RandomAccessFile) = readID3V1Tag(randomAccessFile, 224, 60)
 	
 	private fun readID3V1Tag(randomAccessFile: RandomAccessFile, seekDistanceFromEnd: Int, elementLength: Int): String {
-		randomAccessFile.seek(randomAccessFile.length() - seekDistanceFromEnd);
+		randomAccessFile.seek(randomAccessFile.length() - seekDistanceFromEnd)
 		
 		//read artist
 		var title = readBytes(randomAccessFile, elementLength, true)
-		if (StringUtils.isBlank(title)) {
+		if (title.isBlank()) {
 			title = "Unknown Title"
 		}
 		
 		//read title
 		var artist = readBytes(randomAccessFile, elementLength, true)
-		if (StringUtils.isBlank(artist)) {
+		if (artist.isBlank()) {
 			artist = "Unknown Atist"
 		}
 		
@@ -158,7 +139,7 @@ class PlaylistWriter(private val outputPathAndName: String) {
 	}
 	
 	private fun readID3V2Tag(randomAccessFile: RandomAccessFile, tempFileName: String): String {
-		return tempFileName;
+		return tempFileName
 		//TODO:
 		//https://github.com/mpatric/mp3agic
 	}

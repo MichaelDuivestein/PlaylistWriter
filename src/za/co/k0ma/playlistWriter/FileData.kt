@@ -4,7 +4,7 @@ import java.io.File
 import java.util.TreeSet
 import kotlin.collections.ArrayList
 
-class FileData(var uniqueExtensions: TreeSet<String> = TreeSet(),
+class FileData(val uniqueExtensions: TreeSet<String> = TreeSet(),
                var files: ArrayList<File> = ArrayList()) {
 	
 	fun listFiles(limitListSize: Int?) {
