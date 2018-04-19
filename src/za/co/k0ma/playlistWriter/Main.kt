@@ -2,8 +2,14 @@ import java.io.File
 
 fun main(args: Array<String>) {
 	println("Starting main")
-	val inputPath = args[0]
-	val config = Config.loadConfig(inputPath)
+	val configPath = args.firstOrNull()
+	
+	if(configPath == null) {
+		println("Config path not set in config. Aborting")
+		return
+	}
+	
+	val config = Config.loadConfig(configPath)
 	
 	if (config == null) {
 		println("config is null. Aborting")

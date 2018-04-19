@@ -19,7 +19,7 @@ class PlaylistWriter(private val outputPathAndName: String) {
 	/**
 	 * Basic shuffle. Can do something better later
 	 */
-	fun shuffle(files: Iterable<File>): List<File> = files.shuffled(Random())
+	fun shuffle(files: Iterable<File>) = files.shuffled(Random())
 	
 	fun writePlaylist(files: MutableList<File>, chunkSize: Int, readTags: Boolean) {
 		println("------ Writing playlists. ------")
@@ -124,16 +124,10 @@ class PlaylistWriter(private val outputPathAndName: String) {
 		randomAccessFile.seek(randomAccessFile.length() - seekDistanceFromEnd)
 		
 		//read artist
-		var title = readBytes(randomAccessFile, elementLength, true)
-		if (title.isBlank()) {
-			title = "Unknown Title"
-		}
+		var title = readBytes(randomAccessFile, elementLength, true).takeIf { it.isNotBlank() } ?: "Unknown Title"
 		
 		//read title
-		var artist = readBytes(randomAccessFile, elementLength, true)
-		if (artist.isBlank()) {
-			artist = "Unknown Atist"
-		}
+		var artist = readBytes(randomAccessFile, elementLength, true).takeIf { it.isNotBlank() } ?: "Unknown Artist"
 		
 		return "$artist - $title"
 	}
