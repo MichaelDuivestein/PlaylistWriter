@@ -4,5 +4,8 @@
   "print a list of extensions" : false,
   "print a list of file names" : true,
   "limit list file names to" : 20,
-  "output folder" : "/path/to/output/",
-  "shuffle playlist" : true, "Split playlist" : true}
+  "output folder" : "/path/to/output/playlistName",
+  "playlist name" : "playlist",
+  "shuffle playlist" : true,
+  "Split playlist" : true,
+  "read tags" : true}
