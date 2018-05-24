@@ -2,7 +2,6 @@ package za.co.k0ma.playlistWriter
 
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.exceptions.CannotReadException
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
 import org.jaudiotagger.tag.FieldKey
 import java.io.File
 
@@ -37,16 +36,14 @@ fun readTagWithAudioFileIO(file: File): String {
 		artist = audioFile.tag.getFirst(FieldKey.ARTIST).takeIf { (it != null) && it.isNotBlank() } ?: artist
 		title = audioFile.tag.getFirst(FieldKey.TITLE).takeIf { (it != null) && it.isNotBlank() } ?: title
 		
+	} catch (ex: CannotReadException) {
+		//sometimes files don't contain valid tag data. Log and continue.
+		println("Invalid tag data, CannotReadException: $ex")
+	} catch (ex: CannotReadException) {
+		//sometimes files don't contain valid tag data. Log and continue.
+		println("Invalid tag data, InvalidAudioFrameException: $ex")
 	} catch (ex: Exception) {
-		when (ex) {
-			is CannotReadException,
-			is InvalidAudioFrameException -> {
-				//sometimes files don't contain valid tag data. Log and continue.
-				println(ex)
-			}
-			else -> println(ex)
-		}
-		
+		println(ex)
 	}
 	return "$artist - $title".takeIf { ! it.equals(unknownData) } ?: file.name
 }

@@ -49,11 +49,11 @@ class PlaylistWriter(private val outputPathAndName: String) {
 	}
 	
 	private fun createTitle(file: File, readTags: Boolean): String {
-		if (readTags) {
+		if (readTags)
 			return readTag(file)
-		} else {
+		else
 			return file.nameWithoutExtension
-		}
+		
 	}
 }
 
