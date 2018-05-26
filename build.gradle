@@ -1,4 +1,4 @@
-version '0.0.0.4'
+version '0.0.0.5'
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
@@ -20,10 +20,11 @@ dependencies {
     compile 'com.beust:klaxon:2.1.9'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'commons-io:commons-io:2.6'
+    compile 'org:jaudiotagger:2.0.3'
 }
 
 buildscript {
-    ext.kotlin_version = '1.2.31'
+    ext.kotlin_version = '1.2.40'
     repositories {
         mavenCentral()
     }
