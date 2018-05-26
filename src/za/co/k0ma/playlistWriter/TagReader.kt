@@ -2,6 +2,7 @@ package za.co.k0ma.playlistWriter
 
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.exceptions.CannotReadException
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
 import org.jaudiotagger.tag.FieldKey
 import java.io.File
 
@@ -22,7 +23,7 @@ fun readTag(file: File) = when (file.extension.toLowerCase()) {
 	}
 }
 
-//TODO: this is very slow. In future maybe look at faster implementations for reading tags.
+//TODO: AudioFileIO is very slow. In future maybe look at faster libraries for reading tags.
 fun readTagWithAudioFileIO(file: File): String {
 	var artist = "Unknown Artist"
 	var title = "Unknown Title"
@@ -39,7 +40,7 @@ fun readTagWithAudioFileIO(file: File): String {
 	} catch (ex: CannotReadException) {
 		//sometimes files don't contain valid tag data. Log and continue.
 		println("Invalid tag data, CannotReadException: $ex")
-	} catch (ex: CannotReadException) {
+	} catch (ex: InvalidAudioFrameException) {
 		//sometimes files don't contain valid tag data. Log and continue.
 		println("Invalid tag data, InvalidAudioFrameException: $ex")
 	} catch (ex: Exception) {
