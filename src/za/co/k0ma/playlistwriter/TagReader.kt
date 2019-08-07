@@ -1,4 +1,4 @@
-package za.co.k0ma.playlistWriter
+package za.co.k0ma.playlistwriter
 
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.audio.exceptions.CannotReadException
@@ -46,5 +46,5 @@ fun readTagWithAudioFileIO(file: File): String {
 	} catch (ex: Exception) {
 		println(ex)
 	}
-	return "$artist - $title".takeIf { ! it.equals(unknownData) } ?: file.name
+	return "$artist - $title".takeIf { it != unknownData } ?: file.name
 }
