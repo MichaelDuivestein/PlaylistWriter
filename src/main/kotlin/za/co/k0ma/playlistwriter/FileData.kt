@@ -4,8 +4,10 @@ import java.io.File
 import java.util.TreeSet
 import kotlin.collections.ArrayList
 
-class FileData(val uniqueExtensions: MutableSet<String> = TreeSet(),
-               var files: ArrayList<File> = ArrayList()) {
+data class FileData(
+    val uniqueExtensions: MutableSet<String> = TreeSet(),
+    var files: ArrayList<File> = ArrayList()
+) {
 
     fun listFiles(limitListSize: Int?) {
         println("----- List start ------")

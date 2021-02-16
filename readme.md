@@ -8,9 +8,10 @@ A small tool that:
 
 ## Getting Started
 
-- Copy config.json to a directory of your choice.
+- Open the src/resources/config.json file.
 - Change "music folder" to the path you want to create a playlist from.
 - Change "output folder" to the path you want the playlist[s] to be written to.
+- Change any other settings as you see fit.
 
 - To run, add a new debug configuration.
 - "Main class" is za.co.k0ma.playlistwriter.MainKt.

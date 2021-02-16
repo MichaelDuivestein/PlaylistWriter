@@ -1,28 +1,23 @@
 package za.co.k0ma.playlistwriter
 
+import za.co.k0ma.playlistwriter.config.isInputAndOutputPathLoaded
+import za.co.k0ma.playlistwriter.config.loadConfig
 import java.io.File
 
-fun main(args: Array<String>) {
+fun main() {
     println("Starting main")
-    val configPath = args.firstOrNull()
 
-    if (configPath == null) {
-        println("Config path not set in config. Aborting")
-        return
-    }
-
-    val config = Config.loadConfig(configPath)
+    val config = loadConfig()
 
     if (config == null) {
         println("config is null. Aborting")
         return
-    } else if (!config.isInputAndOutputPathLoaded) {
+    } else if (!isInputAndOutputPathLoaded(config)) {
         println("Input path and/or output path not set in config. Aborting")
         return
     }
 
-    val reader = DirectoryReader(config)
-    val fileData = reader.readFiles()
+    val fileData = readFiles(config)
 
     if (fileData == null) {
         println("No files found. Aborting.")
@@ -39,5 +34,5 @@ fun main(args: Array<String>) {
     if (config.shufflePlaylist) {
         fileData.files = writer.shuffle(fileData.files) as ArrayList<File>
     }
-    writer.writePlaylist(config.outputPath!!, config.playlistName!!, fileData.files, config.chunkSize, config.readTags)
+    writer.writePlaylist(config, fileData.files)
 }
