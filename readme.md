@@ -8,11 +8,9 @@ A small tool that:
 
 ## Getting Started
 
-- Open the src/resources/config.json file.
+- Open `src/resources/config.json` for editing.
 - Change "music folder" to the path you want to create a playlist from.
 - Change "output folder" to the path you want the playlist[s] to be written to.
 - Change any other settings as you see fit.
 
-- To run, add a new debug configuration.
-- "Main class" is za.co.k0ma.playlistwriter.MainKt.
-- "program" arguments should contain the path to your config folder.
+- A run configuration is included in this project and IntelliJ should pick it up.
